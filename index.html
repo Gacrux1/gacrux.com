@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISBN Scanner</title>
+  <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #scanner-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    #scanner {
+      width: 100%;
+      height: auto;
+    }
+
+    #isbn-result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ISBN Book Scanner</h1>
+  
+  <div id="scanner-container">
+    <video id="scanner"></video>
+  </div>
+
+  <div id="isbn-result">Scan an ISBN to get the result</div>
+
+  <script>
+    // Initialize QuaggaJS to scan ISBN-13 barcodes (format used on books)
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector('#scanner'),
+        constraints: {
+          width: 400,
+          height: 300,
+          facingMode: "environment" // Use the back camera
+        }
+      },
+      decoder: {
+        readers: ["ean_reader"] // ean_reader is used for ISBN (EAN-13 format)
+      }
+    }, function (err) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log("QuaggaJS Initialization finished.");
+      Quagga.start();
+    });
+
+    // Process the result
+    Quagga.onDetected(function (result) {
+      const isbn = result.codeResult.code;
+      document.getElementById('isbn-result').innerText = `ISBN: ${isbn}`;
+      // Stop the scanner after detecting a code
+      Quagga.stop();
+    });
+  </script>
+
+</body>
+</html>
